@@ -3,25 +3,22 @@ const app = express();
 
 const playlist = require('./playlist');
 const key = require('./key');
-const generateToken = require('./generateToken'); // ✅ Move this near the top
+const generateToken = require('./generateToken');
+const adminRoutes = require('./admin'); // ✅ Add admin routes
 
-// Root test
+// Use admin dashboard and login
+app.use('/', adminRoutes);
+
+// Root route
 app.get('/', (req, res) => {
   res.send('IPTV Node.js server is running.');
 });
 
-// ✅ Register routes BEFORE listening
+// Playlist + Key + Token
 app.get('/playlist', playlist);
 app.get('/key', key);
 app.get('/get-token', generateToken);
 
-// ✅ Start the server after all routes are set
+// Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-const express = require('express');
-const app = express();
-const adminRoutes = require('./admin'); // ✅ Add this
-
-app.use('/', adminRoutes);
-
