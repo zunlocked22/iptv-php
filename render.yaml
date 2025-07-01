@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: iptv-server
+    name: iptv-php
     env: php
     plan: free
     buildCommand: ""
