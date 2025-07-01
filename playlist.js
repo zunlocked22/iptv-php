@@ -1,9 +1,16 @@
+const { isValid } = require('./tokens');
+
 module.exports = (req, res) => {
+  const token = req.query.token;
   const ua = req.headers['user-agent'] || '';
   const allowedAgents = ['OTT Navigator', 'ExoPlayer', 'VLC', 'Dalvik', 'IPTV', 'TV', 'SmartTV'];
 
+  if (!token || !isValid(token)) {
+    return res.status(403).send('Access Denied: Invalid or expired token');
+  }
+
   if (!allowedAgents.some(agent => ua.includes(agent))) {
-    return res.status(403).send('Access Denied');
+    return res.status(403).send('Access Denied: Invalid User-Agent');
   }
 
   res.set('Content-Type', 'application/x-mpegURL');
@@ -37,6 +44,13 @@ https://qp-pldt-live-grp-11-prod.akamaized.net/out/u/dr_fashiontvhd.mpd
 #KODIPROP:inputstream.adaptive.license_key=a06ca6c275744151895762e0346380f5:559da1b63eec77b5a942018f14d3f56f
 #EXTINF:-1 tvg-id="" tvg-logo="https://i.imgur.com/t4HF5va.png" group-title="Cignal", HBO Signature
 https://qp-pldt-live-grp-01-prod.akamaized.net/out/u/cg_hbosign.mpd
+
+#EXTINF:-1 tvg-id="" tvg-logo="https://i.imgur.com/D33wRIq.png" group-title="Cignal", One Sports+
+#KODIPROP:inputstreamaddon=inputstream.adaptive
+#KODIPROP:inputstream.adaptive.manifest_type=dash
+#KODIPROP:inputstream.adaptive.license_type=org.w3.clearkey
+#KODIPROP:inputstream.adaptive.license_key=322d06e9326f4753a7ec0908030c13d8:1e3e0ca32d421fbfec86feced0efefda
+https://qp-pldt-live-grp-03-prod.akamaized.net/out/u/cg_onesportsplus_hd1.mpd
 `;
 
   res.send(playlist);
