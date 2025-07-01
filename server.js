@@ -18,3 +18,10 @@ app.get('/get-token', generateToken);
 // ✅ Start the server after all routes are set
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+const express = require('express');
+const app = express();
+const adminRoutes = require('./admin'); // ✅ Add this
+
+app.use('/', adminRoutes);
+
