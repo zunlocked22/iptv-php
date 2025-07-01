@@ -1,33 +1,53 @@
-const fs = require('fs');
-const path = './tokens.json';
+// tokens.js
+const { MongoClient } = require('mongodb');
 
-let tokens = {};
-if (fs.existsSync(path)) {
-  tokens = JSON.parse(fs.readFileSync(path));
+const uri = "mongodb+srv://iptvadmin:XvLuIq143xeeNcBs@iptv.screbdn.mongodb.net/?retryWrites=true&w=majority&appName=IPTV";
+const client = new MongoClient(uri);
+const dbName = "iptv";
+let collection;
+
+// Connect once at startup
+async function connectDB() {
+  if (!collection) {
+    await client.connect();
+    const db = client.db(dbName);
+    collection = db.collection("tokens");
+  }
 }
 
-function save() {
-  fs.writeFileSync(path, JSON.stringify(tokens, null, 2));
+// Check if token is valid (not expired)
+async function isValid(token) {
+  await connectDB();
+  const data = await collection.findOne({ token });
+  return data && data.expires > Date.now();
 }
 
-function isValid(token) {
-  return tokens[token] && tokens[token].expires > Date.now();
+// Store a new token
+async function store(token, expires) {
+  await connectDB();
+  await collection.insertOne({ token, expires });
 }
 
-function store(token, expires) {
-  tokens[token] = { expires };
-  save();
+// Remove a token
+async function remove(token) {
+  await connectDB();
+  await collection.deleteOne({ token });
 }
 
-function remove(token) {
-  delete tokens[token];
-  save();
-}
-
-function getAll() {
-  return tokens;
+// Get all tokens
+async function getAll() {
+  await connectDB();
+  const all = await collection.find({}).toArray();
+  const mapped = {};
+  for (const doc of all) {
+    mapped[doc.token] = { expires: doc.expires };
+  }
+  return mapped;
 }
 
 module.exports = {
-  isValid, store, remove, getAll
+  isValid,
+  store,
+  remove,
+  getAll
 };
