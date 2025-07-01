@@ -22,6 +22,9 @@ router.post('/admin', (req, res) => {
 });
 
 // Token dashboard
+const fs = require('fs');
+const path = require('path');
+
 router.get('/dashboard', (req, res) => {
   const all = tokens.getAll();
   let table = '';
@@ -32,13 +35,13 @@ router.get('/dashboard', (req, res) => {
       <td><a href="/delete?token=${token}">❌ Delete</a></td>
     </tr>`;
   }
-  res.sendFile(__dirname + '/views/dashboard.html').replace('{{ROWS}}', table);
-});
 
-router.get('/delete', (req, res) => {
-  const { token } = req.query;
-  tokens.remove(token);
-  res.redirect('/dashboard');
+  const filePath = path.join(__dirname, 'views', 'dashboard.html');
+  fs.readFile(filePath, 'utf8', (err, html) => {
+    if (err) {
+      return res.status(500).send('Error loading dashboard');
+    }
+    const output = html.replace('{{ROWS}}', table);
+    res.send(output);
+  });
 });
-
-module.exports = router;
