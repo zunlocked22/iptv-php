@@ -1,18 +1,33 @@
-const tokens = {
-  // Predefined tokens if needed
-  "abc123": { expires: Date.now() + 60 * 60 * 1000 }
-};
+const fs = require('fs');
+const path = './tokens.json';
+
+let tokens = {};
+if (fs.existsSync(path)) {
+  tokens = JSON.parse(fs.readFileSync(path));
+}
+
+function save() {
+  fs.writeFileSync(path, JSON.stringify(tokens, null, 2));
+}
 
 function isValid(token) {
-  const t = tokens[token];
-  return t && t.expires > Date.now();
+  return tokens[token] && tokens[token].expires > Date.now();
 }
 
 function store(token, expires) {
   tokens[token] = { expires };
+  save();
+}
+
+function remove(token) {
+  delete tokens[token];
+  save();
+}
+
+function getAll() {
+  return tokens;
 }
 
 module.exports = {
-  isValid,
-  store
+  isValid, store, remove, getAll
 };
