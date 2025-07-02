@@ -1,26 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Dashboard</title>
 </head>
 <body>
   <h1>All Active Tokens</h1>
   <table border="1">
-    <thead>
-      <tr>
-        <th>Token</th>
-        <th>Expires</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{ROWS}}
-    </tbody>
+    <tr>
+      <th>Token</th>
+      <th>Expires</th>
+      <th>Actions</th>
+    </tr>
+    {{ROWS}}
   </table>
 
-  <h2>⚠️ Abuse Report</h2> 
+  <h2>⚠️ Abuse Report</h2>
   <table border="1">
     <tr>
       <th>Token</th>
@@ -30,6 +24,5 @@
     </tr>
     {{ABUSE_ROWS}}
   </table>
-
 </body>
 </html>
