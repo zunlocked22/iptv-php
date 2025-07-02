@@ -1,17 +1,26 @@
 const express = require('express');
 const router = express.Router();
-const tokens = require('./tokens');
+const path = require('path');
+const { MongoClient } = require('mongodb');
 
+// MongoDB connection
+const uri = process.env.MONGODB_URI;
+const client = new MongoClient(uri);
+const dbName = 'iptv';
+const collectionName = 'tokens';
+
+// Basic credentials
 const USER = 'admin';
 const PASS = 'admin123';
 
 router.use(express.urlencoded({ extended: true }));
 
-// Login form
+// Login Page
 router.get('/admin', (req, res) => {
-  res.sendFile(__dirname + '/views/login.html');
+  res.sendFile(path.join(__dirname, 'views', 'login.html'));
 });
 
+// Login POST
 router.post('/admin', (req, res) => {
   const { username, password } = req.body;
   if (username === USER && password === PASS) {
@@ -21,31 +30,47 @@ router.post('/admin', (req, res) => {
   }
 });
 
-// Token dashboard
-const fs = require('fs');
-const path = require('path');
+// Dashboard with tokens
+router.get('/dashboard', async (req, res) => {
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const tokens = await db.collection(collectionName).find().toArray();
 
-router.get('/dashboard', (req, res) => {
-  const all = tokens.getAll();
-  let table = '';
-  for (const [token, data] of Object.entries(all)) {
-    table += `<tr>
-      <td>${token}</td>
-      <td>${new Date(data.expires).toLocaleString()}</td>
-      <td><a href="/delete?token=${token}">❌ Delete</a></td>
-    </tr>`;
-  }
-
-  const filePath = path.join(__dirname, 'views', 'dashboard.html');
-  fs.readFile(filePath, 'utf8', (err, html) => {
-    if (err) {
-      return res.status(500).send('Error loading dashboard');
+    let table = '';
+    for (const token of tokens) {
+      table += `<tr>
+        <td>${token.token}</td>
+        <td>${new Date(token.expires).toLocaleString()}</td>
+        <td><a href="/delete?token=${token.token}">❌ Delete</a></td>
+      </tr>`;
     }
-    const output = html.replace('{{ROWS}}', table);
-    res.send(output);
-  });
+
+    const fs = require('fs');
+    const filePath = path.join(__dirname, 'views', 'dashboard.html');
+    fs.readFile(filePath, 'utf8', (err, html) => {
+      if (err) return res.status(500).send('Error loading dashboard');
+      const output = html.replace('{{ROWS}}', table);
+      res.send(output);
+    });
+
+  } catch (err) {
+    console.error('Dashboard error:', err);
+    res.status(500).send('Error connecting to DB');
+  }
 });
 
+// Delete token
+router.get('/delete', async (req, res) => {
+  const { token } = req.query;
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    await db.collection(collectionName).deleteOne({ token });
+    res.redirect('/dashboard');
+  } catch (err) {
+    res.status(500).send('Failed to delete token');
+  }
+});
 
 module.exports = router;
-
