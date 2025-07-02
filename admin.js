@@ -11,7 +11,8 @@ const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri);
 const dbName = 'iptv';
 const tokensCollection = 'tokens';
-const abuseCollection = 'abuseReports';
+const abuseCollection = 'abuse_logs';
+
 
 const USER = 'admin';
 const PASS = 'admin123';
