@@ -1,11 +1,20 @@
-const { isValid } = require('./tokens');
+const express = require('express');
+const router = express.Router();
 
-module.exports = (req, res) => {
+const { isValid } = require('./tokens');
+const { trackTokenUsage } = require('./abuseTracker');
+
+router.get('/playlist', async (req, res) => {
   const token = req.query.token;
   const ua = req.headers['user-agent'] || '';
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
   const allowedAgents = ['OTT Navigator', 'ExoPlayer', 'VLC', 'Dalvik', 'IPTV', 'TV', 'SmartTV'];
 
-  if (!token || !isValid(token)) {
+  // Track token usage for abuse detection
+  trackTokenUsage(token, ip);
+
+  if (!token || !(await isValid(token))) {
     return res.status(403).send('Access Denied: Invalid or expired token');
   }
 
@@ -54,4 +63,6 @@ https://qp-pldt-live-grp-03-prod.akamaized.net/out/u/cg_onesportsplus_hd1.mpd
 `;
 
   res.send(playlist);
-};
+});
+
+module.exports = router;
