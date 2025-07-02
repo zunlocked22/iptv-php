@@ -48,15 +48,15 @@ router.get('/dashboard', async (req, res) => {
     }
 
     let abuseTable = '';
-    for (const abuse of abuses) {
-      abuseTable += `<tr>
-        <td>${abuse.token}</td>
-        <td>${abuse.reason}</td>
-        <td>${abuse.ips?.length || 1}</td>
-        <td>${new Date(abuse.timestamp).toLocaleString()}</td>
-        <td><a href="/delete-abuse?token=${abuse.token}">🗑️ Delete</a></td>
-      </tr>`;
-    }
+for (const [token, { count, lastAccess }] of Object.entries(abuseData)) {
+  abuseTable += `<tr>
+    <td>${token}</td>
+    <td>${count > 1 ? count : '1'}</td>
+    <td>${new Date(lastAccess).toLocaleString()}</td>
+    <td><a href="/delete-abuse?token=${token}">🗑️ Delete</a></td>
+  </tr>`;
+}
+    
 
     const filePath = path.join(__dirname, 'views', 'dashboard.html');
     fs.readFile(filePath, 'utf8', (err, html) => {
