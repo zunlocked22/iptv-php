@@ -1,24 +1,30 @@
 const express = require('express');
 const app = express();
 
-const playlist = require('./playlist');
-const key = require('./key');
-const generateToken = require('./generateToken');
-const adminRoutes = require('./admin'); // ✅ Add admin routes
+const playlistRoutes = require('./playlist');        // ✅ Express Router
+const key = require('./key');                        // ✅ If this is middleware-style
+const generateToken = require('./generateToken');    // ✅ Token route
+const adminRoutes = require('./admin');              // ✅ Admin Dashboard
 
-// Use admin dashboard and login
+app.use(express.urlencoded({ extended: true }));     // Required for admin login form
+
+// Admin login and dashboard
 app.use('/', adminRoutes);
 
-// Root route
+// Playlist router (handles /playlist inside it)
+app.use('/', playlistRoutes);
+
+// License key handler (can stay as-is)
+app.get('/key', key);
+
+// Token generator route
+app.get('/get-token', generateToken);
+
+// Root info page
 app.get('/', (req, res) => {
   res.send('IPTV Node.js server is running.');
 });
 
-// Playlist + Key + Token
-app.get('/playlist', playlist);
-app.get('/key', key);
-app.get('/get-token', generateToken);
-
-// Start server
+// Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
