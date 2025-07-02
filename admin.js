@@ -1,7 +1,10 @@
+// --- Updated admin.js ---
 const express = require('express');
 const router = express.Router();
 const path = require('path');
+const fs = require('fs');
 const { MongoClient } = require('mongodb');
+const { getAbuseReport } = require('./abuseTracker');
 
 // MongoDB connection
 const uri = process.env.MONGODB_URI;
@@ -30,30 +33,41 @@ router.post('/admin', (req, res) => {
   }
 });
 
-// Dashboard with tokens
+// Dashboard with tokens and abuse report
 router.get('/dashboard', async (req, res) => {
   try {
     await client.connect();
     const db = client.db(dbName);
     const tokens = await db.collection(collectionName).find().toArray();
+    const abuseReport = getAbuseReport();
 
-    let table = '';
+    let tokenTable = '';
     for (const token of tokens) {
-      table += `<tr>
+      tokenTable += `<tr>
         <td>${token.token}</td>
         <td>${new Date(token.expires).toLocaleString()}</td>
         <td><a href="/delete?token=${token.token}">❌ Delete</a></td>
       </tr>`;
     }
 
-    const fs = require('fs');
+    let abuseTable = '';
+    for (const entry of abuseReport) {
+      abuseTable += `<tr>
+        <td>${entry.token}</td>
+        <td>${entry.ips.length}</td>
+        <td>${entry.count}</td>
+        <td>${entry.lastAlert}</td>
+      </tr>`;
+    }
+
     const filePath = path.join(__dirname, 'views', 'dashboard.html');
     fs.readFile(filePath, 'utf8', (err, html) => {
       if (err) return res.status(500).send('Error loading dashboard');
-      const output = html.replace('{{ROWS}}', table);
+      const output = html
+        .replace('{{TOKEN_ROWS}}', tokenTable)
+        .replace('{{ABUSE_ROWS}}', abuseTable);
       res.send(output);
     });
-
   } catch (err) {
     console.error('Dashboard error:', err);
     res.status(500).send('Error connecting to DB');
