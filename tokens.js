@@ -1,7 +1,7 @@
 // tokens.js
 const { MongoClient } = require('mongodb');
 
-const uri = "mongodb+srv://iptvadmin:XvLuIq143xeeNcBs@iptv.screbdn.mongodb.net/?retryWrites=true&w=majority&appName=IPTV";
+const uri = "mongodb+srv://iptvadmin:4u4iHr3qO5g4pdT1@iptv.screbdn.mongodb.net/?retryWrites=true&w=majority&appName=IPTV";
 const client = new MongoClient(uri);
 const dbName = "iptv";
 let collection;
