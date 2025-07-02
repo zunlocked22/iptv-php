@@ -6,7 +6,7 @@ const uri = process.env.MONGODB_URI;
 const dbName = 'iptv';
 const collectionName = 'abuse_logs';
 
-const cache = new Map(); // In-memory cache to reduce writes
+const cache = new Map(); // In-memory tracking
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -37,7 +37,7 @@ async function trackTokenUsage(token, ip) {
 
     const reason = isShared ? 'Multiple IPs' : 'Too Many Hits';
 
-    // ✅ Store in MongoDB
+    // ✅ Save to MongoDB
     try {
       const client = new MongoClient(uri);
       await client.connect();
@@ -59,7 +59,7 @@ async function trackTokenUsage(token, ip) {
       console.error('MongoDB write error (abuse log):', err);
     }
 
-    // ✅ Send Email
+    // ✅ Send email alert
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: process.env.EMAIL_RECEIVER,
