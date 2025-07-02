@@ -1,43 +1,77 @@
 // abuseTracker.js
-const sendAbuseEmail = require('./emailAlert');
-const abuseMap = {}; // in-memory token abuse tracking
+const { MongoClient } = require('mongodb');
+const nodemailer = require('nodemailer');
 
-function trackTokenUsage(token, ip) {
-  if (!abuseMap[token]) {
-    abuseMap[token] = {
-      ipSet: new Set(),
-      count: 0,
-      lastAlert: 0
-    };
-  }
+const uri = process.env.MONGODB_URI;
+const dbName = 'iptv';
+const collectionName = 'abuse_logs';
 
-  const record = abuseMap[token];
-  record.ipSet.add(ip);
-  record.count++;
+const cache = new Map(); // In-memory cache to reduce writes
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+async function trackTokenUsage(token, ip) {
+  if (!token || !ip) return;
 
   const now = Date.now();
-  const uniqueIPs = record.ipSet.size;
+  const entry = cache.get(token) || { ips: new Set(), hits: 0, lastAlert: 0 };
+  entry.ips.add(ip);
+  entry.hits += 1;
+  cache.set(token, entry);
 
-  // Alert if 2+ IPs or more than 50 hits, every 10 minutes max
-  if ((uniqueIPs > 1 || record.count > 50) && now - record.lastAlert > 600000) {
-    sendAbuseEmail(token, Array.from(record.ipSet), record.count);
-    record.lastAlert = now;
-  }
-}
+  const uniqueIPs = entry.ips.size;
+  const hits = entry.hits;
 
-function getAbuseReport() {
-  const report = [];
-  for (const [token, data] of Object.entries(abuseMap)) {
-    if (data.ipSet.size > 1 || data.count > 50) {
-      report.push({
-        token,
-        ips: Array.from(data.ipSet),
-        count: data.count,
-        lastAlert: new Date(data.lastAlert).toLocaleString()
-      });
+  const isShared = uniqueIPs >= 2;
+  const isSpammy = hits >= 50;
+  const shouldAlert = isShared || isSpammy;
+
+  if (shouldAlert && now - entry.lastAlert > 60_000) {
+    entry.lastAlert = now;
+
+    const reason = isShared ? 'Multiple IPs' : 'Too Many Hits';
+
+    // ✅ Store in MongoDB
+    try {
+      const client = new MongoClient(uri);
+      await client.connect();
+      const db = client.db(dbName);
+      await db.collection(collectionName).updateOne(
+        { token },
+        {
+          $set: {
+            token,
+            reason,
+            ips: [...entry.ips],
+            timestamp: new Date(),
+          },
+        },
+        { upsert: true }
+      );
+      await client.close();
+    } catch (err) {
+      console.error('MongoDB write error (abuse log):', err);
     }
+
+    // ✅ Send Email
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: process.env.EMAIL_RECEIVER,
+      subject: `⚠️ Abuse Detected for Token: ${token}`,
+      text: `Token: ${token}\nReason: ${reason}\nUnique IPs: ${uniqueIPs}\nHits: ${hits}`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) return console.error('Email error:', error);
+      console.log('Abuse alert email sent:', info.response);
+    });
   }
-  return report;
 }
 
-module.exports = { trackTokenUsage, getAbuseReport };
+module.exports = { trackTokenUsage };
