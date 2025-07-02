@@ -2,10 +2,37 @@
 <html>
 <head>
   <title>Admin Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      color: black;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 40px;
+    }
+    th, td {
+      border: 1px solid #444;
+      padding: 8px 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .warning {
+      color: orange;
+      font-weight: bold;
+      margin-top: 40px;
+    }
+  </style>
 </head>
 <body>
+
   <h1>All Active Tokens</h1>
-  <table border="1">
+  <table>
     <tr>
       <th>Token</th>
       <th>Expires</th>
@@ -14,8 +41,8 @@
     {{ROWS}}
   </table>
 
-  <h2>⚠️ Abuse Report</h2>
-  <table border="1">
+  <div class="warning">⚠️ <strong>Abuse Report</strong></div>
+  <table>
     <tr>
       <th>Token</th>
       <th>IP Count</th>
@@ -24,5 +51,6 @@
     </tr>
     {{ABUSE_ROWS}}
   </table>
+
 </body>
 </html>
