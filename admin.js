@@ -59,11 +59,12 @@ router.get('/dashboard', async (req, res) => {
     for (const report of abuseData) {
       abuseRows += `<tr>
         <td>${report.token}</td>
-        <td>${report.ipCount > 1 ? 'Multiple IPs' : report.ipCount}</td>
-        <td>${new Date(report.lastAccess).toLocaleString()}</td>
+        <td>${report.ips > 1 ? 'Multiple IPs' : report.ips}</td>
+        <td>${new Date(report.timestamp).toLocaleString()}</td>
         <td><a href="/delete-abuse?token=${report.token}">🗑️ Delete</a></td>
       </tr>`;
     }
+
 
     // Load dashboard HTML
     const filePath = path.join(__dirname, 'views', 'dashboard.html');
