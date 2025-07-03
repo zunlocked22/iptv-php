@@ -13,7 +13,6 @@ const dbName = 'iptv';
 const tokensCollection = 'tokens';
 const abuseCollection = 'abuse_logs';
 
-
 const USER = 'admin';
 const PASS = 'admin123';
 
@@ -28,19 +27,24 @@ router.get('/admin', (req, res) => {
 router.post('/admin', (req, res) => {
   const { username, password } = req.body;
   if (username === USER && password === PASS) {
+    req.session.loggedIn = true; // ✅ Set session
     res.redirect('/dashboard');
   } else {
     res.send('Invalid login');
   }
 });
 
-// Dashboard page
+// Dashboard page (protected)
 router.get('/dashboard', async (req, res) => {
+  if (!req.session.loggedIn) {
+    return res.redirect('/admin'); // ✅ Require login
+  }
+
   try {
     await client.connect();
     const db = client.db(dbName);
 
-    // Fetch active tokens
+    // Active tokens
     const tokens = await db.collection(tokensCollection).find().toArray();
 
     let tokenRows = '';
@@ -52,21 +56,20 @@ router.get('/dashboard', async (req, res) => {
       </tr>`;
     }
 
-    // ✅ Fetch abuse report data
+    // Abuse report
     const abuseData = await db.collection(abuseCollection).find().toArray();
 
     let abuseRows = '';
     for (const report of abuseData) {
+      const ipCount = Array.isArray(report.ips) ? report.ips.length : report.ips;
       abuseRows += `<tr>
         <td>${report.token}</td>
-        <td>${report.ips > 1 ? 'Multiple IPs' : report.ips}</td>
-        <td>${new Date(report.timestamp).toLocaleString('en-US', { timeZone: 'Asia/Manila' })}</td> 
+        <td>${ipCount > 1 ? 'Multiple IPs' : ipCount}</td>
+        <td>${new Date(report.timestamp).toLocaleString('en-US', { timeZone: 'Asia/Manila' })}</td>
         <td><a href="/delete-abuse?token=${report.token}">🗑️ Delete</a></td>
       </tr>`;
     }
 
-
-    // Load dashboard HTML
     const filePath = path.join(__dirname, 'views', 'dashboard.html');
     fs.readFile(filePath, 'utf8', (err, html) => {
       if (err) return res.status(500).send('Error loading dashboard');
