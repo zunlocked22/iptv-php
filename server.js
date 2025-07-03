@@ -1,10 +1,9 @@
 const session = require('express-session');
 
-app.use(session({
-  secret: 'yourSecretKey123!', // ✅ Change this to a secure random string
+router.use(session({
+  secret: process.env.SESSION_SECRET,  // ✅ from .env file
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false } // Use true only if using HTTPS
 }));
 
 
