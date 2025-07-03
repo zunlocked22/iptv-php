@@ -1,3 +1,13 @@
+const session = require('express-session');
+
+app.use(session({
+  secret: 'yourSecretKey123!', // ✅ Change this to a secure random string
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // Use true only if using HTTPS
+}));
+
+
 require('dotenv').config();
 const express = require('express');
 const app = express();
