@@ -47,7 +47,7 @@ router.get('/dashboard', async (req, res) => {
     for (const token of tokens) {
       tokenRows += `<tr>
         <td>${token.token}</td>
-        <td>${new Date(token.expires).toLocaleString()}</td>
+        <td>${new Date(token.expires).toLocaleString('en-US', { timeZone: 'Asia/Manila' })}</td>
         <td><a href="/delete?token=${token.token}">❌ Delete</a></td>
       </tr>`;
     }
@@ -60,7 +60,7 @@ router.get('/dashboard', async (req, res) => {
       abuseRows += `<tr>
         <td>${report.token}</td>
         <td>${report.ips > 1 ? 'Multiple IPs' : report.ips}</td>
-        <td>${new Date(report.timestamp).toLocaleString()}</td>
+        <td>${new Date(report.timestamp).toLocaleString('en-US', { timeZone: 'Asia/Manila' })}</td> 
         <td><a href="/delete-abuse?token=${report.token}">🗑️ Delete</a></td>
       </tr>`;
     }
