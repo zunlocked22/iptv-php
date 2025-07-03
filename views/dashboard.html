@@ -1,56 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
   <title>Admin Dashboard</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-    }
-    h1 {
-      color: black;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-bottom: 40px;
-    }
-    th, td {
-      border: 1px solid #444;
-      padding: 8px 12px;
-      text-align: left;
-    }
-    th {
+      padding: 30px;
       background-color: #f2f2f2;
     }
-    .warning {
-      color: orange;
-      font-weight: bold;
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    h2 {
       margin-top: 40px;
+    }
+
+    .scroll-table {
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      background-color: white;
+      border-radius: 6px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+
+    .scroll-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .scroll-table th,
+    .scroll-table td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    .scroll-table thead th {
+      position: sticky;
+      top: 0;
+      background-color: #f9f9f9;
+      z-index: 1;
+    }
+
+    a {
+      color: red;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
+  <h1>Admin Dashboard</h1>
 
-  <h1>All Active Tokens</h1>
-  <table>
-    <tr>
-      <th>Token</th>
-      <th>Expires</th>
-      <th>Actions</th>
-    </tr>
-    {{ROWS}}
-  </table>
+  <h2>Active Tokens</h2>
+  <div class="scroll-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Token</th>
+          <th>Expires</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ROWS}}
+      </tbody>
+    </table>
+  </div>
 
-  <div class="warning">⚠️ <strong>Abuse Report</strong></div>
-  <table>
-    <tr>
-      <th>Token</th>
-      <th>IP Count</th>
-      <th>Last Accessed</th>
-      <th>Action</th>
-    </tr>
-    {{ABUSE_ROWS}}
-  </table>
-
+  <h2>⚠️ Abuse Report</h2>
+  <div class="scroll-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Token</th>
+          <th>IP Count</th>
+          <th>Last Access</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ABUSE_ROWS}}
+      </tbody>
+    </table>
+  </div>
 </body>
 </html>
