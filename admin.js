@@ -23,21 +23,34 @@ router.use(session({
   saveUninitialized: true,
 }));
 
-// Login page
+// Login GET
 router.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'login.html'));
+  const filePath = path.join(__dirname, 'views', 'login.html');
+  fs.readFile(filePath, 'utf8', (err, html) => {
+    if (err) return res.status(500).send('Login page load error');
+    const error = req.query.error ? `<script>alert("Invalid Credentials");</script>` : '';
+    res.send(html + error);
+  });
 });
 
-// Login submit
+// Login POST
 router.post('/admin', (req, res) => {
   const { username, password } = req.body;
   if (username === USER && password === PASS) {
     req.session.loggedIn = true;
     res.redirect('/dashboard');
   } else {
-    res.send('Invalid login');
+    res.redirect('/admin?error=1'); // ❌ Invalid login
   }
 });
+
+// Logout
+router.get('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/admin');
+  });
+});
+
 
 // ✅ Middleware to protect admin routes
 function requireLogin(req, res, next) {
