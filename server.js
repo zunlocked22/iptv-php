@@ -1,40 +1,40 @@
-const session = require('express-session');
+require('dotenv').config();
+const express = require('express');
+const session = require('express-session'); // ✅ Load session module
 
-router.use(session({
-  secret: process.env.SESSION_SECRET,  // ✅ from .env file
+const app = express();
+
+// ✅ Set up session for the whole app
+app.use(session({
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
 }));
 
+app.use(express.urlencoded({ extended: true }));
 
-require('dotenv').config();
-const express = require('express');
-const app = express();
-
-const playlistRoutes = require('./playlist');        // ✅ Express Router
-const key = require('./key');                        // ✅ If this is middleware-style
-const generateToken = require('./generateToken');    // ✅ Token route
-const adminRoutes = require('./admin');              // ✅ Admin Dashboard
-
-app.use(express.urlencoded({ extended: true }));     // Required for admin login form
+const playlistRoutes = require('./playlist');
+const key = require('./key');
+const generateToken = require('./generateToken');
+const adminRoutes = require('./admin'); // ✅ Your updated admin.js
 
 // Admin login and dashboard
 app.use('/', adminRoutes);
 
-// Playlist router (handles /playlist inside it)
+// Playlist routes
 app.use('/', playlistRoutes);
 
-// License key handler (can stay as-is)
+// Key route
 app.get('/key', key);
 
-// Token generator route
+// Token generator
 app.get('/get-token', generateToken);
 
-// Root info page
+// Root
 app.get('/', (req, res) => {
   res.send('IPTV Node.js server is running.');
 });
 
-// Start the server
+// Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
