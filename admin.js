@@ -3,8 +3,7 @@ const router = express.Router();
 const path = require('path');
 const { MongoClient } = require('mongodb');
 const fs = require('fs');
-
-// Load .env
+const session = require('express-session'); // ✅ Add session support
 require('dotenv').config();
 
 const uri = process.env.MONGODB_URI;
@@ -16,7 +15,13 @@ const abuseCollection = 'abuse_logs';
 const USER = 'admin';
 const PASS = 'admin123';
 
+// Middleware
 router.use(express.urlencoded({ extended: true }));
+router.use(session({
+  secret: process.env.SESSION_SECRET || 'fallbackSecretKey',
+  resave: false,
+  saveUninitialized: true,
+}));
 
 // Login page
 router.get('/admin', (req, res) => {
@@ -27,25 +32,27 @@ router.get('/admin', (req, res) => {
 router.post('/admin', (req, res) => {
   const { username, password } = req.body;
   if (username === USER && password === PASS) {
-    req.session.loggedIn = true; // ✅ Set session
+    req.session.loggedIn = true;
     res.redirect('/dashboard');
   } else {
     res.send('Invalid login');
   }
 });
 
-// Dashboard page (protected)
-router.get('/dashboard', async (req, res) => {
-  if (!req.session.loggedIn) {
-    return res.redirect('/admin'); // ✅ Require login
-  }
+// ✅ Middleware to protect admin routes
+function requireLogin(req, res, next) {
+  if (!req.session.loggedIn) return res.redirect('/admin');
+  next();
+}
 
+// Dashboard (protected)
+router.get('/dashboard', requireLogin, async (req, res) => {
   try {
     await client.connect();
     const db = client.db(dbName);
 
-    // Active tokens
     const tokens = await db.collection(tokensCollection).find().toArray();
+    const abuseData = await db.collection(abuseCollection).find().toArray();
 
     let tokenRows = '';
     for (const token of tokens) {
@@ -55,9 +62,6 @@ router.get('/dashboard', async (req, res) => {
         <td><a href="/delete?token=${token.token}">❌ Delete</a></td>
       </tr>`;
     }
-
-    // Abuse report
-    const abuseData = await db.collection(abuseCollection).find().toArray();
 
     let abuseRows = '';
     for (const report of abuseData) {
@@ -84,8 +88,8 @@ router.get('/dashboard', async (req, res) => {
   }
 });
 
-// Token delete
-router.get('/delete', async (req, res) => {
+// Delete token (protected)
+router.get('/delete', requireLogin, async (req, res) => {
   const { token } = req.query;
   try {
     await client.connect();
@@ -97,8 +101,8 @@ router.get('/delete', async (req, res) => {
   }
 });
 
-// Abuse report delete
-router.get('/delete-abuse', async (req, res) => {
+// Delete abuse report (protected)
+router.get('/delete-abuse', requireLogin, async (req, res) => {
   const { token } = req.query;
   try {
     await client.connect();
