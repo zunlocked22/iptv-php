@@ -81,11 +81,12 @@ router.get('/dashboard', requireLogin, async (req, res) => {
       const ipCount = Array.isArray(report.ips) ? report.ips.length : report.ips;
       abuseRows += `<tr>
         <td>${report.token}</td>
-        <td>${ipCount > 1 ? 'Multiple IPs' : ipCount}</td>
+        <td>${ipCount} IP${ipCount === 1 ? '' : 's'}</td>
         <td>${new Date(report.timestamp).toLocaleString('en-US', { timeZone: 'Asia/Manila' })}</td>
         <td><a href="/delete-abuse?token=${report.token}">🗑️ Delete</a></td>
       </tr>`;
     }
+
 
     const filePath = path.join(__dirname, 'views', 'dashboard.html');
     fs.readFile(filePath, 'utf8', (err, html) => {
