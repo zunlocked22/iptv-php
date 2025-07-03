@@ -3,7 +3,7 @@ const router = express.Router();
 const path = require('path');
 const { MongoClient } = require('mongodb');
 const fs = require('fs');
-const session = require('express-session'); // ✅ Add session support
+const session = require('express-session');
 require('dotenv').config();
 
 const uri = process.env.MONGODB_URI;
@@ -51,8 +51,7 @@ router.get('/logout', (req, res) => {
   });
 });
 
-
-// ✅ Middleware to protect admin routes
+// Middleware to protect admin routes
 function requireLogin(req, res, next) {
   if (!req.session.loggedIn) return res.redirect('/admin');
   next();
@@ -79,14 +78,22 @@ router.get('/dashboard', requireLogin, async (req, res) => {
     let abuseRows = '';
     for (const report of abuseData) {
       const ipCount = Array.isArray(report.ips) ? report.ips.length : report.ips;
+      const ipList = Array.isArray(report.ips) ? report.ips.join('<br>') : report.ips;
+      const modalId = `modal-${report.token}`;
       abuseRows += `<tr>
         <td>${report.token}</td>
-        <td>${ipCount} IP${ipCount === 1 ? '' : 's'}</td>
+        <td><a href="#" onclick="document.getElementById('${modalId}').style.display='block'">${ipCount} IP${ipCount === 1 ? '' : 's'}</a></td>
         <td>${new Date(report.timestamp).toLocaleString('en-US', { timeZone: 'Asia/Manila' })}</td>
         <td><a href="/delete-abuse?token=${report.token}">🗑️ Delete</a></td>
-      </tr>`;
+      </tr>
+      <div id="${modalId}" class="modal">
+        <div class="modal-content">
+          <span class="close" onclick="document.getElementById('${modalId}').style.display='none'">&times;</span>
+          <h3>IP List for ${report.token}</h3>
+          <p>${ipList}</p>
+        </div>
+      </div>`;
     }
-
 
     const filePath = path.join(__dirname, 'views', 'dashboard.html');
     fs.readFile(filePath, 'utf8', (err, html) => {
