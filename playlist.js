@@ -173,6 +173,16 @@ https://tglmp01.akamaized.net/out/v1/de55fad9216e4fe7ad8d2eed456ba1ec/manifest.m
 http://fl1.moveonjoy.com/NICKELODEON/index.m3u8
 
 
+
+#EXTINF:-1 tvg-id="" group-title="Web-TV" tvg-logo="https://aqfadtv.xyz/logos/NickJr2023.png" ,Nick Jr
+#KODIPROP:inputstreamaddon=inputstream.adaptive
+#KODIPROP:inputstream.adaptive.manifest_type=dash
+#KODIPROP:inputstream.adaptive.license_type=clearkey
+#KODIPROP:inputstream.adaptive.license_key=https://ck-dash-mpd.aqfadtv.xyz/dash-ck/linear/9982
+#EXTVLCOPT:http-user-agent=Mozilla/5.0 (Linux; Android 12; Pixel 3a XL Build/SP2A.220505.008; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/114.0.5715.0 Mobile Safari/537.36
+https://linearjitp-playback.astro.com.my/dash-wv/linear/9982/default_ott.mpd
+
+
 #EXTINF:-1 tvg-id="Cartoon.Net.Hd" group-title="Web-TV" tvg-logo="https://logos-world.net/wp-content/uploads/2021/08/Cartoon-Network-Logo-2010-present.png",Cartoon Network
 #KODIPROP:inputstream.adaptive.manifest_type=dash
 #KODIPROP:inputstream.adaptive.license_type=clearkey
@@ -293,7 +303,7 @@ https://shls-live-enc.edgenextcdn.net/out/v1/46079e838e65490c8299f902a7731168/in
 #KODIPROP:inputstream.adaptive.license_key=4503cf86bca3494ab95a77ed913619a0:afc9c8f627fb3fb255dee8e3b0fe1d71
 https://qp-pldt-live-grp-11-prod.akamaized.net/out/u/dr_warnertvhd.mpd
 
-#EXTINF:-1 tvg-logo="https://images.seeklogo.com/logo-png/5/2/fox-sports-logo-png_seeklogo-57162.png?v=1956071233450768888" group-title="Web-TV",Fox Sports
+#EXTINF:-1 tvg-logo="https://th.bing.com/th/id/R.34d9783d78a3717e5ec59cf17e6f0200?rik=rrELDABBD080jg&riu=http%3a%2f%2fvignette1.wikia.nocookie.net%2flogopedia%2fimages%2f6%2f6f%2fLogo_fox_sports.png%2frevision%2flatest%3fcb%3d20140414164158&ehk=dGqPScdeTEqIGpb8d99DSF9Tw5Y%2bxFJLtIqV2Q5xjlk%3d&risl=&pid=ImgRaw&r=0" group-title="Web-TV",Fox Sports
 https://cfd-v4-service-channel-stitcher-use1-1.prd.pluto.tv/stitch/hls/channel/5a74b8e1e22a61737979c6bf/master.m3u8?appName=web&appVersion=unknown&clientTime=0&deviceDNT=0&deviceId=6c28f173-30d3-11ef-9cf5-e9ddff8ff496&deviceMake=Chrome&deviceModel=web&deviceType=web&deviceVersion=unknown&includeExtendedEvents=false&serverSideAds=false&sid=46a3b8ff-5a4a-4952-bb4d-9461224acd54
 
 
@@ -309,6 +319,13 @@ https://raw.githubusercontent.com/mystery75/m3u8/main/IONMYSTERY.m3u8
 #KODIPROP:inputstream.adaptive.license_type=org.w3.clearkey
 #KODIPROP:inputstream.adaptive.license_key=00208c93f4358213b52220898b962385:8ae6063167228e350dd132d4a1573102
 https://fsly.stream.peacocktv.com/Content/CMAF_CTR-4s/Live/channel(vc106wh3yw)/master.mpd
+
+#EXTINF:-1 tvg-id="" tvg-logo="https://bestmediainfo.com/uploads/2017/08/MOVIES-NOW-LOGO_6.jpg" group-title="Web-TV", Movies Now
+#KODIPROP:inputstream.adaptive.license_type=org.w3.clearkey
+#KODIPROP:inputstream.adaptive.license_key=40f019b86241d23ef075633fd7f1e927:058dec845bd340178a388edd104a015e
+https://times-ott-live.akamaized.net/moviesnow_wv_drm/index.mpd
+
+
 `;
 
   res.send(playlist);
