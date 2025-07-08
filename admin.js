@@ -12,8 +12,8 @@ const dbName = 'iptv';
 const tokensCollection = 'tokens';
 const abuseCollection = 'abuse_logs';
 
-const USER = 'admin';
-const PASS = 'admin123';
+const USER = 'azjamez';
+const PASS = 'az-admin001z';
 
 // Middleware
 router.use(express.urlencoded({ extended: true }));
