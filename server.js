@@ -32,7 +32,7 @@ app.get('/get-token', generateToken);
 
 // Root
 app.get('/', (req, res) => {
-  res.send('WEb-AZTV Node.js server is running.');
+  res.send('WEB-AZTV Node.js server is running.');
 });
 
 // Start server
