@@ -19,7 +19,7 @@ router.get('/playlist', async (req, res) => {
   }
 
   if (!allowedAgents.some(agent => ua.includes(agent))) {
-    return res.status(403).send('Access Denied: Invalid User-Agent');
+    return res.status(403).send('Access Denied: Invalid Url!');
   }
 
   res.set('Content-Type', 'application/x-mpegURL');
