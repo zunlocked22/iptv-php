@@ -2,135 +2,215 @@
 <html>
 <head>
   <title>Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
+    /* --- General Styles --- */
+    :root {
+      --bg-color: #f4f7fa;
+      --card-bg-color: #ffffff;
+      --header-bg-color: #ffffff;
+      --text-color: #333;
+      --border-color: #e0e0e0;
+      --danger-color: #dc3545;
+      --danger-hover-color: #c82333;
+      --shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: sans-serif;
-      padding: 20px;
-      background-color: #f5f5f5;
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
     }
 
-    h2 {
-      margin-top: 30px;
+    /* --- Header --- */
+    .header {
+      background-color: var(--header-bg-color);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
     }
 
+    .header h1 {
+      font-size: 1.5rem;
+    }
+
+    .header .logout-link {
+      text-decoration: none;
+      color: var(--danger-color);
+      font-weight: 500;
+    }
+
+    /* --- Main Dashboard Layout --- */
+    .dashboard-container {
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    /* On larger screens, use two columns */
+    @media (min-width: 992px) {
+      .dashboard-container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* --- Card Style --- */
+    .card {
+      background-color: var(--card-bg-color);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+    }
+
+    .card h2 {
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+
+    /* --- Search Box --- */
     .search-box {
-      margin-bottom: 10px;
+      margin-bottom: 1rem;
     }
 
+    .search-box input[type="text"] {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    /* --- Table Styles --- */
     .table-wrapper {
-      max-height: 300px;
+      max-height: 400px;
       overflow-y: auto;
-      border: 1px solid #ccc;
-      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 600px;
     }
 
     th, td {
-      padding: 8px;
-      border: 1px solid #ccc;
+      padding: 0.75rem 1rem;
       text-align: left;
+      border-bottom: 1px solid var(--border-color);
     }
 
     th {
-      background-color: #eee;
-    }
-
-    input[type="text"] {
-      padding: 6px;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 999;
-      padding-top: 80px;
-      left: 0;
+      background-color: #f9fafb;
+      font-weight: 600;
+      position: sticky;
       top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.4);
-    }
-    .modal-content {
-      background-color: #fff;
-      margin: auto;
-      padding: 20px;
-      width: 60%;
-      border-radius: 8px;
-    }
-    .close {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .close:hover {
-      color: #000;
     }
     
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+    
+    tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    /* --- Button Styles (for links) --- */
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      text-align: center;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+
+    .btn-danger {
+      background-color: var(--danger-color);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background-color: var(--danger-hover-color);
+    }
   </style>
 </head>
 <body>
   
-   <h2>IPTV Admin Dashboard</h2>
-  <div style="text-align: right; padding: 10px;">
-  <a href="/logout" style="text-decoration: none; color: red;">🔒 Logout</a>
-  </div>
+  <header class="header">
+    <h1>IPTV Admin Dashboard</h1>
+    <a href="/logout" class="logout-link">🔒 Logout</a>
+  </header>
 
-  <h2>Active Tokens</h2>
-  <div class="search-box">
-    <input type="text" id="tokenSearch" placeholder="Search tokens...">
-  </div>
-  <div class="table-wrapper">
-    <table id="tokensTable">
-      <thead>
-        <tr>
-          <th>Token</th>
-          <th>Expires</th>
-          <th>Delete</th>
-        </tr>
-      </thead>
-      <tbody>
-        {{ROWS}}
-      </tbody>
-    </table>
-  </div>
+  <main class="dashboard-container">
+    <div class="card">
+      <h2>Active Tokens</h2>
+      <div class="search-box">
+        <input type="text" id="tokenSearch" placeholder="Search tokens...">
+      </div>
+      <div class="table-wrapper">
+        <table id="tokensTable">
+          <thead>
+            <tr>
+              <th>Token</th>
+              <th>Expires</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ROWS}}
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-  <h2>⚠️ Abuse Report</h2>
-  <div class="search-box">
-    <input type="text" id="abuseSearch" placeholder="Search abuse logs...">
-  </div>
-  <div class="table-wrapper">
-    <table id="abuseTable">
-      <thead>
-        <tr>
-          <th>Token</th>
-          <th>IPs</th>
-          <th>Last Access</th>
-          <th>Delete</th>
-        </tr>
-      </thead>
-      <tbody>
-        {{ABUSE_ROWS}}
-      </tbody>
-    </table>
-  </div>
+    <div class="card">
+      <h2>⚠️ Abuse Report</h2>
+      <div class="search-box">
+        <input type="text" id="abuseSearch" placeholder="Search abuse logs...">
+      </div>
+      <div class="table-wrapper">
+        <table id="abuseTable">
+          <thead>
+            <tr>
+              <th>Token</th>
+              <th>IPs</th>
+              <th>Last Access</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ABUSE_ROWS}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
 
   <script>
+    // This simple script filters table rows based on search input.
     const filterTable = (inputId, tableId) => {
       const input = document.getElementById(inputId);
       const table = document.getElementById(tableId);
       input.addEventListener("keyup", () => {
         const filter = input.value.toLowerCase();
         const rows = table.getElementsByTagName("tr");
+        // Start from 1 to skip the header row (thead)
         for (let i = 1; i < rows.length; i++) {
           const text = rows[i].innerText.toLowerCase();
           rows[i].style.display = text.includes(filter) ? "" : "none";
